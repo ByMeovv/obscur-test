@@ -1,7 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, log } from "./vite";
-import serveStatic from "serve-static";
 import path from "path";
 
 const app = express();
@@ -52,12 +51,9 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    // Serve static files from client/dist in production
-    app.use(express.static(path.join(__dirname, '../client/dist')));
-
-    // Catch all other requests and serve index.html (for SPA)
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    // API routes only in production
+    app.get("*", (req, res) => {
+      res.status(404).json({ message: "API endpoint not found" });
     });
   }
 
