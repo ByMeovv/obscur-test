@@ -13,7 +13,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: client/Dockerfile.frontend
     container_name: obscur_frontend
     restart: always
     ports:
