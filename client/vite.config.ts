@@ -3,8 +3,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-
-const dirname = new URL('.', import.meta.url).pathname;
+import { fileURLToPath, URL } from 'node:url';
 
 export default async () => {
   const plugins = [
@@ -21,19 +20,28 @@ export default async () => {
     plugins,
     resolve: {
       alias: {
-        "@": path.resolve(dirname, "src"),
+        "@": fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    root: dirname,
     build: {
       outDir: "dist",
       emptyOutDir: true,
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
     },
     server: {
+      host: true,
+      port: 5173,
       fs: {
         strict: true,
         deny: ["**/.*"],
       },
     },
+    base: "./",  // Фикс для относительных путей в production
+    publicDir: "public",
   });
 };
