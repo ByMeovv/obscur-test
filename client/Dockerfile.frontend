@@ -1,30 +1,31 @@
 # Многоэтапная сборка
 FROM node:20-alpine AS build
 
-WORKDIR /app
+# Устанавливаем рабочую директорию для клиента
+WORKDIR /app/client
 
-# Копируем package.json и package-lock.json
-COPY package*.json ./
+# Копируем package.json и package-lock.json клиента
+COPY client/package*.json ./
 
 # Устанавливаем зависимости
 RUN npm install
 
 # Копируем исходный код клиента
-COPY . .
+COPY client/ ./
 
-# Собираем приложение
+# Собираем приложение (Vite build создаст /dist)
 RUN npm run build
 
 # Производственный образ
 FROM nginx:alpine
 
-# Копируем собранное приложение из правильной папки
-COPY --from=build /app/dist /usr/share/nginx/html
+# Копируем собранное приложение из этапа build
+COPY --from=build /app/client/dist /usr/share/nginx/html
 
-# Создаем конфигурационный файл nginx
+# Создаем конфигурационный файл nginx (твой оригинал, но с server_name под твой домен)
 RUN echo 'server { \
     listen 80; \
-    server_name localhost; \
+    server_name obscur-clothes.ru; \
     root /usr/share/nginx/html; \
     index index.html; \
     \
