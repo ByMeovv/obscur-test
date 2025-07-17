@@ -1,47 +1,48 @@
 // client/vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import { fileURLToPath, URL } from 'node:url'; // Используем современный API для путей
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-import { fileURLToPath } from "url";
-
-// Абсолютный путь к директории client
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default async () => {
-  const plugins = [react(), runtimeErrorOverlay()];
+  const plugins = [
+    react(),
+    runtimeErrorOverlay(),
+  ];
 
-  // Подключение cartographer, если нужно
+  // Логика для плагинов Replit остается без изменений
   if (process.env.NODE_ENV !== "production" && process.env.REPL_ID !== undefined) {
     const { cartographer } = await import("@replit/vite-plugin-cartographer");
     plugins.push(cartographer());
   }
 
   return defineConfig({
-    // Список плагинов
     plugins,
+    
+    // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ:
+    // Устанавливаем базовый путь как относительный. 
+    // Это заставит Vite генерировать пути вида "./assets/index.css" вместо "/assets/index.css",
+    // что решает проблему на 99% хостингов.
+    base: "./",
 
-    // Alias для удобства
     resolve: {
+      // Используем более надежный способ определения алиасов
       alias: {
-        "@": path.resolve(__dirname, "src"),
+        "@": fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
 
-    // Важно для правильного подключения CSS/JS в проде
-    base: "./",
+    // Убираем 'root', так как Vite сам определит корень проекта.
+    // Это избавляет от потенциальных конфликтов.
 
-    // Корень проекта
-    root: __dirname,
-
-    // Каталог для вывода сборки
     build: {
-      outDir: path.resolve(__dirname, "dist"),
+      outDir: "dist",
       emptyOutDir: true,
+      sourcemap: false, // Отключаем source maps для production сборки
     },
-
-    // Настройки dev-сервера (не нужно менять)
+    
     server: {
+      host: true, // Делает dev-сервер доступным по локальной сети
       fs: {
         strict: true,
         deny: ["**/.*"],
