@@ -20,28 +20,51 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Создаем конфигурационный файл nginx (твой оригинал, но с server_name под твой домен)
-RUN echo 'server {\
+RUN echo 'server { \
     listen 80; \
     server_name obscur-clothes.ru; \
     root /usr/share/nginx/html; \
     index index.html; \
-\
+    \
+    # Обработка SPA-роутов (для React, чтобы все пути вели к index.html) \
     location / { \
-        try_files $uri /index.html; \
-    }\
-\
-    location ~* \.(css|js)$ { \
-        add_header Content-Type text/css; \
-        add_header Access-Control-Allow-Origin * always; \
+        try_files $uri $uri/ /index.html; \
+    } \
+    \
+    # Отдача ассетов (CSS, JS, изображения для background) с кэшем, gzip и MIME \
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ { \
+        types { \
+            text/css css; \
+            application/javascript js; \
+            image/jpeg jpg jpeg; \
+            image/png png; \
+            image/gif gif; \
+            image/svg+xml svg; \
+            font/woff woff; \
+            font/woff2 woff2; \
+            font/ttf ttf; \
+            application/vnd.ms-fontobject eot; \
+        } \
+        expires 30d; \
+        add_header Cache-Control "public, no-transform"; \
+        gzip on; \
+        gzip_types text/css application/javascript image/* font/*; \
         try_files $uri =404; \
-    } \ 
-\
-    error_page 500 502 503 504 /50x.html; \
-    location = /50x.html { \
-        root /usr/share/nginx/html;\
-    }\
+    } \
+    \
+    # Прокси на API (если нужно) \
+    location /api/ { \
+        proxy_pass http://backend:5000/api/; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; \
+        proxy_set_header X-Forwarded-Proto $scheme; \
+    } \
+    \
+    # Обработка ошибок (опционально) \
+    error_page 404 /index.html; \
 }' > /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 80 443
 
 CMD ["nginx", "-g", "daemon off;"]

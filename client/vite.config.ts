@@ -26,7 +26,7 @@ export default async () => {
       },
     },
     root: __dirname,
-    base: "./",
+    base: "./",  // Ключ: Относительные пути для ассетов
     build: {
       outDir: path.resolve(__dirname, "dist"),
       emptyOutDir: true,
