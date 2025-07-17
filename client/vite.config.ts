@@ -1,8 +1,11 @@
 // client/vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-import { fileURLToPath, URL } from 'node:url';
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default async () => {
   const plugins = [
@@ -19,28 +22,19 @@ export default async () => {
     plugins,
     resolve: {
       alias: {
-        "@": fileURLToPath(new URL('./src', import.meta.url)),  // Более надёжный способ расчёта пути
+        "@": path.resolve(__dirname, "src"),
       },
     },
+    root: __dirname, // Корень — папка client
     build: {
-      outDir: "dist",
+      outDir: path.resolve(__dirname, "dist"), // dist будет в client/dist
       emptyOutDir: true,
-      sourcemap: false,  // Отключаем для production (меньше размер, нет утечек)
-      rollupOptions: {
-        output: {
-          manualChunks: undefined,  // Предотвращаем ненужное разделение чанков
-        },
-      },
     },
     server: {
-      host: true,  // Доступно по localhost и IP
-      port: 5173,  // Фиксированный порт для dev
       fs: {
         strict: true,
         deny: ["**/.*"],
       },
     },
-    base: "./",  // Фикс для относительных путей в production (решает проблемы со стилями/ресурсами)
-    publicDir: "public",  // Явно указываем папку для статических файлов
   });
 };
