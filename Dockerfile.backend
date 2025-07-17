@@ -1,0 +1,50 @@
+FROM node:20
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+RUN npm install --save-dev esbuild typescript
+
+COPY server ./server
+COPY shared ./shared
+COPY tsconfig.json ./
+
+RUN mkdir -p dist
+
+RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outfile=dist/index.js
+
+EXPOSE 5000
+
+CMD ["node", "dist/index.js"] 
+# Используем официальный Node.js
+FROM node:20
+
+# Директория в контейнере
+WORKDIR /app
+
+# Копируем package.json для установки зависимостей
+COPY package*.json ./
+
+# Устанавливаем зависимости
+RUN npm ci --only=production
+
+# Устанавливаем dev зависимости для сборки
+RUN npm install --save-dev esbuild typescript
+
+# Копируем исходный код
+COPY server ./server
+COPY shared ./shared
+COPY tsconfig.json ./
+
+# Создаем директорию dist
+RUN mkdir -p dist
+
+# Собираем backend
+RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outfile=dist/index.js
+
+# Открываем порт
+EXPOSE 5000
+
+# Запускаем backend
+CMD ["node", "dist/index.js"]
