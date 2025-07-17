@@ -1,7 +1,9 @@
+/* Подключение Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* CSS-переменные темы */
 :root {
   --background: hsl(0, 0%, 0%);
   --foreground: hsl(0, 0%, 100%);
@@ -30,65 +32,70 @@
   --obscur-gray: hsl(0, 0%, 17.6%);
 }
 
+/* Базовые стили */
 @layer base {
+  /* Глобальные стили */
   * {
     @apply border-border;
   }
 
+  /* Тело страницы */
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
   }
 
+  /* Моноширинный шрифт */
   .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
 
+  /* Единые стили для заголовков H1 во всех контекстах */
   :where(h1) {
-    font-size: 2rem;
-    margin-block: 0.67rem;
+    font-size: 2em;
+    margin-block: 0.67em;
   }
 }
 
+/* Кастомные компоненты */
 @layer components {
+  /* Анимированный фон огня */
   .fire-bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, 
-      #000000 0%, 
-      #1a1a1a 25%, 
-      #2d2d2d 50%, 
-      #1a1a1a 75%, 
-      #000000 100%);
+    background: linear-gradient(45deg, #000000 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #000000 100%);
     background-size: 400% 400%;
     animation: fire 4s ease-in-out infinite;
     z-index: -1;
   }
-  
+
+  /* Градиентный текст */
   .gradient-text {
     background: linear-gradient(135deg, hsl(262, 83%, 70%), hsl(270, 64%, 68%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
+  /* Эффект при наведении на карточку */
   .card-hover {
     transition: all 0.3s ease;
   }
-  
+
   .card-hover:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
   }
-  
+
+  /* Индикатор в реальном времени */
   .real-time-indicator {
     position: relative;
   }
-  
+
   .real-time-indicator::before {
     content: '';
     position: absolute;
@@ -98,7 +105,8 @@
     border-radius: 50%;
     animation: pulse 2s infinite;
   }
-  
+
+  /* Счётчик Telegram с градиентным текстом */
   .telegram-counter {
     background: linear-gradient(135deg, #0088cc, #00a8ff);
     -webkit-background-clip: text;
@@ -107,51 +115,38 @@
   }
 }
 
+/* Пользовательские утилиты и анимации */
 @layer utilities {
+  /* Скрытие скроллбара */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  
+
+  /* Анимации */
   @keyframes fire {
-    0% { 
-      transform: scale(1) rotate(0deg); 
-      opacity: 0.7; 
-      background-position: 0% 50%;
-    }
-    100% { 
-      transform: scale(1.1) rotate(2deg); 
-      opacity: 0.9;
-      background-position: 100% 50%;
-    }
+    0% { transform: scale(1) rotate(0deg); opacity: 0.7; background-position: 0% 50%; }
+    100% { transform: scale(1.1) rotate(2deg); opacity: 0.9; background-position: 100% 50%; }
   }
-  
+
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
   }
-  
+
   @keyframes glow {
     0% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
     100% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
   }
-  
+
   @keyframes pulse {
-    0% { 
-      transform: scale(0.95); 
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); 
-    }
-    70% { 
-      transform: scale(1); 
-      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); 
-    }
-    100% { 
-      transform: scale(0.95); 
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); 
-    }
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
   }
 
   @keyframes gothicGlow {
@@ -180,18 +175,19 @@
     100% { left: 100%; }
   }
 
+  /* Классы анимаций */
   .animate-fire {
     animation: fire 2s ease-in-out infinite alternate;
   }
-  
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
-  
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite alternate;
   }
-  
+
   .animate-pulse-slow {
     animation: pulse 3s ease-in-out infinite;
   }
